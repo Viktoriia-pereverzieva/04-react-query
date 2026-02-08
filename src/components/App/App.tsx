@@ -4,12 +4,13 @@ import Loader from '../Loader/Loader'
 import MovieGrid from '../MovieGrid/MovieGrid'
 import MovieModal from '../MovieModal/MovieModal'
 import SearchBar from '../SearchBar/SearchBar'
-import { Toaster }from 'react-hot-toast';
+import { Toaster, toast }from 'react-hot-toast';
 import type { Movie } from '../../types/movie';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchMovies } from "../../services/movieService";
 import {keepPreviousData, useQuery} from '@tanstack/react-query'
 import ReactPaginate from 'react-paginate'
+
 
 
 export default function App() {
@@ -25,6 +26,12 @@ export default function App() {
     placeholderData: keepPreviousData,
   });
 
+  useEffect(() => {
+    if (isSuccess && data?.results.length === 0) {
+      toast.error('No movies found for your request');
+    }
+  }, [isSuccess, data]);
+
   const totalPages = data?.total_pages ?? 0;
 
   const handleSearch = (newTopic: string) => {
@@ -34,6 +41,7 @@ export default function App() {
 
   return (
     <>
+      
     <SearchBar onSubmit={handleSearch}/>
       {isSuccess && totalPages > 1 && (
       <ReactPaginate 
